@@ -17,31 +17,40 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get Ollama host from environment variable or use localhost
-    const ollamaHost = process.env.OLLAMA_HOST || 'http://localhost:11434';
-    const ollamaModel = process.env.OLLAMA_MODEL || 'llama3.2';
+    // Get OpenRouter API key from environment variable
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    
+    if (!apiKey) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'OpenRouter API key not configured' })
+      };
+    }
 
-    // Call Ollama API
-    const response = await fetch(`${ollamaHost}/api/chat`, {
+    // Call OpenRouter API
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://courageous-malabi-81c858.netlify.app',
+        'X-Title': 'Smart AI Assistant'
       },
       body: JSON.stringify({
-        model: ollamaModel,
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
         messages: [
           { role: 'user', content: prompt }
-        ],
-        stream: false
+        ]
       })
     });
 
     if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`OpenRouter API error: ${response.status} - ${JSON.stringify(errorData)}`);
     }
 
     const data = await response.json();
-    const aiReply = data.message?.content || 'No response from AI';
+    const aiReply = data.choices?.[0]?.message?.content || 'No response from AI';
 
     return {
       statusCode: 200,
