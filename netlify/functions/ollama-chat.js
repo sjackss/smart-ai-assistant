@@ -1,3 +1,5 @@
+// netlify/functions/ollama-chat.js
+
 exports.handler = async (event, context) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -8,8 +10,8 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { prompt } = JSON.parse(event.body);
-    
+    const { prompt } = JSON.parse(event.body || '{}');
+
     if (!prompt) {
       return {
         statusCode: 400,
@@ -19,7 +21,7 @@ exports.handler = async (event, context) => {
 
     // Get OpenRouter API key from environment variable
     const apiKey = process.env.OPENROUTER_API_KEY;
-    
+
     if (!apiKey) {
       return {
         statusCode: 500,
@@ -45,28 +47,29 @@ exports.handler = async (event, context) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`OpenRouter API error: ${response.status} - ${JSON.stringify(errorData)}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `OpenRouter API error: ${response.status} - ${JSON.stringify(errorData)}`
+      );
     }
 
     const data = await response.json();
-    const aiReply = data.choices?.[0]?.message?.content || 'No response from AI';
+    const aiReply =
+      (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) ||
+      'No response from AI';
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reply: aiReply })
     };
-
   } catch (error) {
     console.error('Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: 'Failed to get AI response',
-        details: error.message 
+        details: error.message
       })
     };
   }
