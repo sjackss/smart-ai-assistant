@@ -1,173 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart AI Assistant</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            max-width: 800px;
-            width: 100%;
-            padding: 40px;
-        }
-        h1 {
-            color: #667eea;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-        }
-        .status {
-            text-align: center;
-            padding: 15px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background: #fafafa;
-        }
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            font-size: 16px;
-        }
-        button {
-            padding: 15px 30px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #764ba2;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .user-message {
-            background: #e3f2fd;
-            text-align: right;
-        }
-        .ai-message {
-            background: #f3e5f5;
-            text-align: left;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart AI Assistant</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+    }
+    h1 {
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+    }
+    .status {
+      text-align: center;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .chat-box {
+      height: 400px;
+      overflow-y: auto;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #667eea;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    button {
+      padding: 15px 30px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s;
+    }
+    button:hover { background: #764ba2; }
+    .message { margin: 10px 0; padding: 10px; border-radius: 8px; }
+    .user-message { background: #e3f2fd; text-align: right; }
+    .ai-message { background: #f3e5f5; text-align: left; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🤖 Smart AI Assistant</h1>
-        <div class="status" id="status">
-            <p>Running on localhost:1234</p>
-        </div>
-        <div class="chat-box" id="chatBox">
-            <p class="ai-message message">Hello! I'm your Smart AI Assistant. How can I help you today?</p>
-            <p>Connected to Ollama via Netlify Functions</p>        <div class="input-group">
-            <input type="text" id="userInput" placeholder="Ask me anything..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
+  <div class="container">
+    <h1>🤖 Smart AI Assistant</h1>
+    <div class="status" id="status">
+      <p>Connected to Netlify Functions & OpenRouter</p>
     </div>
+    <div class="chat-box" id="chatBox">
+      <p class="ai-message message">
+        Hello! I'm your Smart AI Assistant. How can I help you today?
+      </p>
+    </div>
+    <div class="input-group">
+      <input type="text" id="userInput" placeholder="Ask me anything..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
-        
-        const firebaseConfig = {
-            apiKey: "AIzaSyA0-GoBfWsGCKiAlmncTaFZZzAtuvlPsVU",
-            authDomain: "smart-ai-assistant-83295.firebaseapp.com",
-            projectId: "smart-ai-assistant-83295",
-            storageBucket: "smart-ai-assistant-83295.firebasestorage.app",
-            messagingSenderId: "784534882454",
-            appId: "1:784534882454:web:1dddaef2f62f993750dab7",
-            measurementId: "G-ZDF1ZLDD6J"
-        };
-        
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        console.log('Firebase initialized successfully!');
-    </script>
+  <!-- (Optional) Firebase analytics – safe to leave if you want -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
 
-    <script>
-        function sendMessage() {
-            const input = document.getElementById('userInput');
-            const chatBox = document.getElementById('chatBox');
-            const userMessage = input.value.trim();
-            
-            if (userMessage) {
-                // Display user message
-                const userDiv = document.createElement('div');
-                userDiv.className = 'message user-message';
-                userDiv.textContent = userMessage;
-                chatBox.appendChild(userDiv);
-                
-                // Call Netlify Function to get AI response
-        fetch('/.netlify/functions/ollama-chat', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt: userMessage })
-        })
-        .then(response => response.json())
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0-GoBfWsGCKiAlmncTaFZZzAtuvlPsVU",
+      authDomain: "smart-ai-assistant-83295.firebaseapp.com",
+      projectId: "smart-ai-assistant-83295",
+      storageBucket: "smart-ai-assistant-83295.firebasestorage.app",
+      messagingSenderId: "784534882454",
+      appId: "1:784534882454:web:1dddaef2f62f993750dab7",
+      measurementId: "G-ZDF1ZLDD6J"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    getAnalytics(app);
+  </script>
+
+  <script>
+    function appendMessage(text, className) {
+      const chatBox = document.getElementById('chatBox');
+      const div = document.createElement('div');
+      div.className = 'message ' + className;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      appendMessage(userMessage, 'user-message');
+      input.value = '';
+
+      fetch('/.netlify/functions/ollama-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userMessage })
+      })
+        .then(res => res.json())
         .then(data => {
-          const aiDiv = document.createElement('div');
-          aiDiv.className = 'message ai-message';
-          aiDiv.textContent = data.reply || data.error || 'No response from AI';
-          chatBox.appendChild(aiDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+          appendMessage(
+            data.reply || data.error || 'No response from AI',
+            'ai-message'
+          );
         })
-        .catch(error => {
-          const aiDiv = document.createElement('div');
-          aiDiv.className = 'message ai-message';
-          aiDiv.textContent = 'Error: ' + error.message + '. Make sure Ollama is running and configured.';
-          chatBox.appendChild(aiDiv);
-          chatBox.scrollTop = chatBox.scrollHeight;
+        .catch(err => {
+          appendMessage(
+            'Error: ' + err.message,
+            'ai-message'
+          );
         });
-                input.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        }
-        
-        document.getElementById('userInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
-    </script>
+    }
+
+    document.getElementById('userInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
 </body>
 </html>
